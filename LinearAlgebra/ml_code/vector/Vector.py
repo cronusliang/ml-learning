@@ -12,7 +12,7 @@ class Vector(object):
         try:
             if not coordinates:
                 raise ValueError
-            self.coordinates = tuple([x for x in coordinates])
+            self.coordinates = tuple([ Decimal(x) for x in coordinates])
             self.dimension = len(self.coordinates)
 
         except ValueError:
@@ -29,8 +29,16 @@ class Vector(object):
     def __eq__(self, v):
         return self.coordinates == v.coordinates
 
+    def plus(self, v):
+        new_coordinates = [x + y for x, y in zip(self.coordinates, v.coordinates)]
+        return Vector(new_coordinates)
+
+    def minus(self, v):
+        new_coordinates = [x - y for x, y in zip(self.coordinates, v.coordinates)]
+        return Vector(new_coordinates)
+
     def times_scalar(self,c):
-        new_coordinates = [c * x for x in self.coordinates]
+        new_coordinates = [Decimal(c)* x for x in self.coordinates]
         return Vector(new_coordinates)
 
     def magnitude(self):
@@ -40,7 +48,7 @@ class Vector(object):
     def normalized(self):
         try:
             magnitude = self.magnitude()
-            return self.times_scalar(1.0/ magnitude)
+            return self.times_scalar(1.0/magnitude)
         except ZeroDivisionError:
             raise Exception('cannot normalized the zero vector')
 
@@ -52,7 +60,6 @@ class Vector(object):
             u1 = self.normalized()
             u2 = v.normalized()
             u3 = u1.dot(u2)
-
             angle_in_radians = acos(u3)
             if in_degrees:
                degrees_per_radian = 180./ pi
