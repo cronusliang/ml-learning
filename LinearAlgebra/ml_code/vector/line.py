@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from decimal import Decimal, getcontext
-
-from vector import Vector
+from Vector import Vector
 
 getcontext().prec = 30
 
@@ -15,6 +14,7 @@ class Line(object):
 
         if not normal_vector:
             all_zeros = ['0']*self.dimension
+
             normal_vector = Vector(all_zeros)
         self.normal_vector = normal_vector
 
@@ -25,7 +25,7 @@ class Line(object):
         self.set_basepoint()
 
     def is_parallel_to(self,ell):
-        n1 = self.normal_vector
+        n1 = self.normal_vector    # 获取法向量
         n2 = ell.normal_vector
         return n1.is_parallel_to(n2)
 
@@ -36,7 +36,7 @@ class Line(object):
         y0 = other.basepoint
         basepoint_difference = x0.minus(y0)
         n = self.normal_vector
-        return basepoint_difference.is_orthogonal_to(n)
+        return basepoint_difference.is_orthogonal_to(n)  # 两点连线的向量是否与法向量正交
 
     # 基准点
     def set_basepoint(self):
@@ -57,6 +57,24 @@ class Line(object):
             else:
                 raise e
 
+    # 直线的交点
+    def intersection_with(self,ell):
+        try:
+            A,B = self.normal_vector.coordinates
+            C,D = ell.normal_vector.coordinates
+            k1 = self.constant_term
+            k2 = ell.constant_term
+
+            x_numerator = D*k1 - B*k2
+            y_numerator = -C*k1 - A*k2
+            one_over_denom = Decimal('1')/(A*D - B*C)
+
+            return Vector([x_numerator,y_numerator]).scalar(one_over_denom)
+        except ZeroDivisionError:
+            if self == ell:
+                return self
+            else:
+                return None
 
     def __str__(self):
 
