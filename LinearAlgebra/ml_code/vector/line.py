@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from decimal import Decimal, getcontext
 
 from vector import Vector
@@ -23,7 +24,21 @@ class Line(object):
 
         self.set_basepoint()
 
+    def is_parallel_to(self,ell):
+        n1 = self.normal_vector
+        n2 = ell.normal_vector
+        return n1.is_parallel_to(n2)
 
+    def __eq__(self, other):
+        if not self.is_parallel_to(other):
+            return False
+        x0 = self.basepoint
+        y0 = other.basepoint
+        basepoint_difference = x0.minus(y0)
+        n = self.normal_vector
+        return basepoint_difference.is_orthogonal_to(n)
+
+    # 基准点
     def set_basepoint(self):
         try:
             n = self.normal_vector
