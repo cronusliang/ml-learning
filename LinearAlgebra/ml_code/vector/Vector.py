@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
 from math import sqrt, acos, pi
-from decimal import Decimal,getcontext
+
+from decimal import Decimal, getcontext
 
 import numpy
 
