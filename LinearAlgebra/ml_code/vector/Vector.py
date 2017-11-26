@@ -3,7 +3,6 @@ from math import sqrt, acos, pi
 
 from decimal import Decimal, getcontext
 
-import numpy
 
 getcontext().prec = 30
 
@@ -16,8 +15,8 @@ class Vector(object):
         try:
             if not coordinates:
                 raise ValueError
-            self.coordinates = tuple([x for x in coordinates])  # 返回一个元祖 ,坐标
-            self.dimension = len(coordinates)
+            self.coordinates = tuple([Decimal(x) for x in coordinates])  # 返回一个元祖 ,坐标
+            self.dimension = len(self.coordinates)
 
         except ValueError:
             raise ValueError('The coordinates must be nonempty')
@@ -45,7 +44,7 @@ class Vector(object):
 
     #标量乘法
     def scalar(self,c):
-        new_coordinates = [c * x for x in self.coordinates]
+        new_coordinates = [Decimal(c) * x for x in self.coordinates]
         return Vector(new_coordinates)
 
      # 向量的大小
@@ -57,9 +56,9 @@ class Vector(object):
     def normalized(self):
         try:
             magnitude = self.magnitude()   # 先求出大小
-            return self.scalar(1.0/ magnitude)   # 再相乘
+            return self.scalar(Decimal('1.0')/Decimal(magnitude))   # 再相乘
         except ZeroDivisionError:
-            raise Exception('cannot normalized the zero vector')
+            raise Exception(self.CANNOT_NORMALEZE_ZERO_VECTOR_MSG)
 
     # 求向量的点积
     def dotProduct(self,v):
@@ -73,7 +72,11 @@ class Vector(object):
             u2 = v.normalized()
             u3 = u1.dotProduct(u2)
 
-            angle_in_radians = numpy.arccos(u3)  # 求出弧度
+            if abs(u3)>= 1:  # 防止acos 计算出错
+                u3 = 1
+
+            angle_in_radians = acos(u3)
+            # angle_in_radians = numpy.arccos(u3)  # 求出弧度
 
             if in_degrees:  # 如果是角度
                 degrees_per_radian = 180. / pi
@@ -147,4 +150,18 @@ class Vector(object):
 
     # 向量三角形面积
     def area_of_triangle_with(self,v):
-        return self.area_of_parallelogram_with(v) / Decimal('2.0')
+        return  self.area_of_parallelogram_with(v) / (2.0)
+
+
+v = Vector(['8.462','7.893','-8.187'])
+w = Vector(['6.984','-5.975','4.778'])
+print v.cross(w)
+
+
+v = Vector(['-8.987','-9.838','5.031'])
+w = Vector(['-4.268','-1.861','-8.866'])
+print v.area_of_parallelogram_with(w)
+
+v = Vector(['1.5','9.547','3.691'])
+w = Vector(['-6.007','0.124','5.772'])
+print v.area_of_triangle_with(w)
