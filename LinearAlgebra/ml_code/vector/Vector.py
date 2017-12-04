@@ -24,6 +24,7 @@ class Vector(object):
         except TypeError:
             raise TypeError('The coordinates must be an iterable')
 
+
     # 输出向量坐标
     def __str__(self):
         return 'Vector: {}'.format(self.coordinates)
@@ -152,16 +153,3 @@ class Vector(object):
     def area_of_triangle_with(self,v):
         return  self.area_of_parallelogram_with(v) / (2.0)
 
-
-v = Vector(['8.462','7.893','-8.187'])
-w = Vector(['6.984','-5.975','4.778'])
-print v.cross(w)
-
-
-v = Vector(['-8.987','-9.838','5.031'])
-w = Vector(['-4.268','-1.861','-8.866'])
-print v.area_of_parallelogram_with(w)
-
-v = Vector(['1.5','9.547','3.691'])
-w = Vector(['-6.007','0.124','5.772'])
-print v.area_of_triangle_with(w)

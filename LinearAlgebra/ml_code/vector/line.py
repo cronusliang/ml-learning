@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from decimal import Decimal, getcontext
 from Vector import Vector
+from collections import Iterable
 
 getcontext().prec = 30
 
@@ -24,13 +25,24 @@ class Line(object):
 
         self.set_basepoint()
 
+    # 两条直线是否平行
     def is_parallel_to(self,ell):
         n1 = self.normal_vector    # 获取法向量
         n2 = ell.normal_vector
         return n1.is_parallel_to(n2)
 
+    # 两条直线是否相等
     def __eq__(self, other):
-        if not self.is_parallel_to(other):
+
+        if self.normal_vector.is_zero():
+            if not other.normal_vector.is_zero():
+                return False
+            else:
+                diff = self.constant_term - other.constant_term
+                return MyDecimal(diff).is_zero()
+        elif other.normal_vector.is_zero():
+            return False
+        if not self.is_parallel_to(other):  # 判断是否平行
             return False
         x0 = self.basepoint
         y0 = other.basepoint
@@ -45,8 +57,9 @@ class Line(object):
             c = self.constant_term
             basepoint_coords = ['0']*self.dimension
 
-            initial_index = Line.first_nonzero_index(n)
-            initial_coefficient = n[initial_index]
+            initial_index = Line.first_nonzero_index(n.coordinates)
+
+            initial_coefficient = n.coordinates[initial_index]
 
             basepoint_coords[initial_index] = c/initial_coefficient
             self.basepoint = Vector(basepoint_coords)
@@ -62,12 +75,13 @@ class Line(object):
         try:
             A,B = self.normal_vector.coordinates
             C,D = ell.normal_vector.coordinates
+
             k1 = self.constant_term
             k2 = ell.constant_term
 
             x_numerator = D*k1 - B*k2
-            y_numerator = -C*k1 - A*k2
-            one_over_denom = Decimal('1')/(A*D - B*C)
+            y_numerator = -C*k1 + A*k2
+            one_over_denom = Decimal('1')/(A*D - B*C)  # 平行 A*D-B*C 为零
 
             return Vector([x_numerator,y_numerator]).scalar(one_over_denom)
         except ZeroDivisionError:
@@ -103,9 +117,9 @@ class Line(object):
         n = self.normal_vector
 
         try:
-            initial_index = Line.first_nonzero_index(n)
-            terms = [write_coefficient(n[i], is_initial_term=(i==initial_index)) + 'x_{}'.format(i+1)
-                     for i in range(self.dimension) if round(n[i], num_decimal_places) != 0]
+            initial_index = Line.first_nonzero_index(n.coordinates)
+            terms = [write_coefficient(n.coordinates[i], is_initial_term=(i==initial_index)) + 'x_{}'.format(i+1)
+                     for i in range(self.dimension) if round(n.coordinates[i], num_decimal_places) != 0]
             output = ' '.join(terms)
 
         except Exception as e:
@@ -124,12 +138,33 @@ class Line(object):
 
     @staticmethod
     def first_nonzero_index(iterable):
+
+
+        # for i in range(len(iterable.coordinates)):
+        #     if not MyDecimal(iterable.coordinates[i]).is_near_zero():
+        #         print 'i : ',i
+        #         return i
+
+        # print '------- ',isinstance(iterable,Iterable)
         for k, item in enumerate(iterable):
             if not MyDecimal(item).is_near_zero():
                 return k
         raise Exception(Line.NO_NONZERO_ELTS_FOUND_MSG)
 
 
+#检测某个数字是否在误差范围0内
 class MyDecimal(Decimal):
     def is_near_zero(self, eps=1e-10):
         return abs(self) < eps
+
+ell1 = Line(normal_vector=Vector(['4.046','2.836']),constant_term='1.21')
+ell2 = Line(normal_vector=Vector(['10.115','7.09']),constant_term='3.025')
+print 'intersection 1:',ell1.intersection_with(ell2)
+
+ell1 = Line(normal_vector=Vector(['7.204','3.182']),constant_term='8.68')
+ell2 = Line(normal_vector=Vector(['8.172','4.114']),constant_term='9.883')
+print 'intersection 2:',ell1.intersection_with(ell2)
+
+ell1 = Line(normal_vector=Vector(['1.182','5.562']),constant_term='6.744')
+ell2 = Line(normal_vector=Vector(['1.773','8.343']),constant_term='9.525')
+print 'intersection 3:',ell1.intersection_with(ell2)
