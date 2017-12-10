@@ -51,22 +51,31 @@ class Plane(object):
 
     # 两个平面是否相等
     def __eq__(self, other):
+        if not self.basepoint and not other.basepoint:
+            return True
+        basepoint_difference = self.basepoint.minus(other.basepoint)
+        if self.basepoint == other.basepoint and self.normal_vector == other.normal_vector:
+            return True
+        elif basepoint_difference.is_orthogonal_to(self.normal_vector) and basepoint_difference.is_orthogonal_to(other.normal_vector):
+            return True
+        else:
+            return False
 
-        if self.normal_vector.is_zero():
-            if not other.normal_vector.is_zero():
-                return False
-            else:
-                diff = self.constant_term - other.constant_term
-                return MyDecimal(diff).is_zero()
-        elif other.normal_vector.is_zero():
-            return False
-        if not self.is_parallel_to(other):  # 判断是否平行
-            return False
-        x0 = self.basepoint
-        y0 = other.basepoint
-        basepoint_difference = x0.minus(y0)
-        n = self.normal_vector
-        return basepoint_difference.is_orthogonal_to(n)  # 两点连线的向量是否与法向量正交
+        # if self.normal_vector.is_zero():
+        #     if not other.normal_vector.is_zero():
+        #         return False
+        #     else:
+        #         diff = self.constant_term - other.constant_term
+        #         return MyDecimal(diff).is_zero()
+        # elif other.normal_vector.is_zero():
+        #     return False
+        # if not self.is_parallel_to(other):  # 判断是否平行
+        #     return False
+        # x0 = self.basepoint
+        # y0 = other.basepoint
+        # basepoint_difference = x0.minus(y0)
+        # n = self.normal_vector
+        # return basepoint_difference.is_orthogonal_to(n)  # 两点连线的向量是否与法向量正交
 
     def __str__(self):
 
@@ -126,17 +135,17 @@ class MyDecimal(Decimal):
     def is_near_zero(self, eps=1e-10):
         return abs(self) < eps
 
-p1 = Plane(normal_vector=Vector(['-0.412','3.806','0.728']),constant_term='-3.46')
-p2 = Plane(normal_vector=Vector(['1.03','-9.515','-1.82']),constant_term='8.65')
-print 'first pair of planes are parallel?:{} ',format(p1.is_parallel_to(p2))
-print 'first pair of planes are equal?:{} ',format(p1==p2)
-
-p1 = Plane(normal_vector=Vector(['2.611','5.528','0.283']),constant_term='4.6')
-p2 = Plane(normal_vector=Vector(['7.715','8.306','5.342']),constant_term='3.76')
-print 'second pair of planes are parallel?:{} ',format(p1.is_parallel_to(p2))
-print 'second pair of planes are equal?:{} ',format(p1==p2)
-
-p1 = Plane(normal_vector=Vector(['-7.926','8.625','-7.212']),constant_term='-7.95')
-p2 = Plane(normal_vector=Vector(['-2.642','2.875','-2.404']),constant_term='-2.44')
-print 'third pair of planes are parallel?:{} ',format(p1.is_parallel_to(p2))
-print 'third pair of planes are equal?:{} ',format(p1==p2)
+# p1 = Plane(normal_vector=Vector(['-0.412','3.806','0.728']),constant_term='-3.46')
+# p2 = Plane(normal_vector=Vector(['1.03','-9.515','-1.82']),constant_term='8.65')
+# print 'first pair of planes are parallel?:{} ',format(p1.is_parallel_to(p2))
+# print 'first pair of planes are equal?:{} ',format(p1==p2)
+#
+# p1 = Plane(normal_vector=Vector(['2.611','5.528','0.283']),constant_term='4.6')
+# p2 = Plane(normal_vector=Vector(['7.715','8.306','5.342']),constant_term='3.76')
+# print 'second pair of planes are parallel?:{} ',format(p1.is_parallel_to(p2))
+# print 'second pair of planes are equal?:{} ',format(p1==p2)
+#
+# p1 = Plane(normal_vector=Vector(['-7.926','8.625','-7.212']),constant_term='-7.95')
+# p2 = Plane(normal_vector=Vector(['-2.642','2.875','-2.404']),constant_term='-2.44')
+# print 'third pair of planes are parallel?:{} ',format(p1.is_parallel_to(p2))
+# print 'third pair of planes are equal?:{} ',format(p1==p2)
